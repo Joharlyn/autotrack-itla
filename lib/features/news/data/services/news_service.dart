@@ -9,18 +9,15 @@ class NewsService {
     int page = 1,
   }) async {
     final response = await _client.get(
-      '/noticias',
+      '/publico/noticias',
       queryParameters: {'page': page},
-      token: token,
     );
 
     final payload = response['data'] ?? response;
-    return DataUtils.extractList(payload, [
-      'noticias',
-      'items',
-      'rows',
-      'data',
-    ]);
+    return DataUtils.extractList(
+      payload,
+      ['noticias', 'items', 'rows', 'data'],
+    );
   }
 
   Future<Map<String, dynamic>> getNewsDetail({
@@ -34,11 +31,9 @@ class NewsService {
     );
 
     final payload = response['data'] ?? response;
-    return DataUtils.extractMap(payload, [
-      'noticia',
-      'detalle',
-      'item',
-      'data',
-    ]);
+    return DataUtils.extractMap(
+      payload,
+      ['noticia', 'detalle', 'item', 'data'],
+    );
   }
 }

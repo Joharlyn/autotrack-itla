@@ -10,7 +10,10 @@ import '../../data/services/vehicles_service.dart';
 class VehicleFormPage extends StatefulWidget {
   final Map<String, dynamic>? initialData;
 
-  const VehicleFormPage({super.key, this.initialData});
+  const VehicleFormPage({
+    super.key,
+    this.initialData,
+  });
 
   @override
   State<VehicleFormPage> createState() => _VehicleFormPageState();
@@ -44,11 +47,10 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
     _marcaController.text = DataUtils.firstString(data, ['marca']);
     _modeloController.text = DataUtils.firstString(data, ['modelo', 'nombre']);
     _anioController.text = DataUtils.firstString(data, ['anio', 'year']);
-    _ruedasController.text = DataUtils.firstString(data, [
-      'cantidadRuedas',
-      'cantidad_ruedas',
-      'ruedas',
-    ]);
+    _ruedasController.text = DataUtils.firstString(
+      data,
+      ['cantidadRuedas', 'cantidad_ruedas', 'ruedas'],
+    );
   }
 
   @override
@@ -141,9 +143,9 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
   }
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -155,13 +157,56 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
         title: Text(_isEditing ? 'Editar vehículo' : 'Nuevo vehículo'),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
         children: [
           Container(
-            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(color: AppTheme.border),
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xFF141B26),
+                  Color(0xFF0B1017),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(22),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _isEditing ? 'Actualiza tu vehículo' : 'Registra un nuevo vehículo',
+                    style: const TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: 28,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.8,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _isEditing
+                        ? 'Modifica la información principal y mantén actualizado tu garage.'
+                        : 'Completa los datos principales para agregar un nuevo vehículo a la app.',
+                    style: const TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: 14,
+                      height: 1.45,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 22),
+          Container(
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: AppTheme.card,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(24),
               border: Border.all(color: AppTheme.border),
             ),
             child: Column(
@@ -171,35 +216,50 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
                   'Datos del vehículo',
                   style: TextStyle(
                     color: AppTheme.textPrimary,
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: _placaController,
-                  decoration: const InputDecoration(labelText: 'Placa'),
+                  decoration: const InputDecoration(
+                    labelText: 'Placa',
+                    prefixIcon: Icon(Icons.pin_outlined),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _chasisController,
-                  decoration: const InputDecoration(labelText: 'Chasis'),
+                  decoration: const InputDecoration(
+                    labelText: 'Chasis',
+                    prefixIcon: Icon(Icons.qr_code_rounded),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _marcaController,
-                  decoration: const InputDecoration(labelText: 'Marca'),
+                  decoration: const InputDecoration(
+                    labelText: 'Marca',
+                    prefixIcon: Icon(Icons.sell_rounded),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _modeloController,
-                  decoration: const InputDecoration(labelText: 'Modelo'),
+                  decoration: const InputDecoration(
+                    labelText: 'Modelo',
+                    prefixIcon: Icon(Icons.directions_car_rounded),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _anioController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Año'),
+                  decoration: const InputDecoration(
+                    labelText: 'Año',
+                    prefixIcon: Icon(Icons.calendar_month_rounded),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -207,27 +267,28 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Cantidad de ruedas',
+                    prefixIcon: Icon(Icons.tire_repair_rounded),
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: AppTheme.card,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(24),
               border: Border.all(color: AppTheme.border),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Foto',
+                  'Foto del vehículo',
                   style: TextStyle(
                     color: AppTheme.textPrimary,
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -236,53 +297,63 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
                   if (_photoPath != null)
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
                         color: AppTheme.softCard,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(18),
                         border: Border.all(color: AppTheme.border),
                       ),
                       child: Text(
                         'Imagen seleccionada:\n$_photoPath',
-                        style: const TextStyle(color: AppTheme.textSecondary),
+                        style: const TextStyle(
+                          color: AppTheme.textSecondary,
+                          height: 1.5,
+                        ),
                       ),
                     )
                   else
                     const Text(
-                      'Puedes crear el vehículo con foto opcional.',
-                      style: TextStyle(color: AppTheme.textSecondary),
+                      'Puedes registrar el vehículo con una foto opcional para darle una mejor presentación visual.',
+                      style: TextStyle(
+                        color: AppTheme.textSecondary,
+                        height: 1.5,
+                      ),
                     ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   ElevatedButton.icon(
                     onPressed: _pickPhoto,
                     icon: const Icon(Icons.add_a_photo_rounded),
-                    label: const Text('Elegir foto'),
+                    label: const Text('Seleccionar foto'),
                   ),
                 ] else ...[
-                  if (initialImage.isNotEmpty)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppTheme.softCard,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: AppTheme.border),
-                      ),
-                      child: Text(
-                        'La foto actual se cambia desde el detalle del vehículo.',
-                        style: const TextStyle(color: AppTheme.textSecondary),
-                      ),
-                    )
-                  else
-                    const Text(
-                      'La foto se cambia desde el detalle del vehículo.',
-                      style: TextStyle(color: AppTheme.textSecondary),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppTheme.softCard,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: AppTheme.border),
                     ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          initialImage.isNotEmpty
+                              ? 'La foto actual se cambia desde el detalle del vehículo.'
+                              : 'Puedes cambiar la foto desde la pantalla de detalle del vehículo.',
+                          style: const TextStyle(
+                            color: AppTheme.textSecondary,
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
           ElevatedButton.icon(
             onPressed: _isSaving ? null : _save,
             icon: const Icon(Icons.save_rounded),
@@ -290,8 +361,8 @@ class _VehicleFormPageState extends State<VehicleFormPage> {
               _isSaving
                   ? 'Guardando...'
                   : _isEditing
-                  ? 'Guardar cambios'
-                  : 'Crear vehículo',
+                      ? 'Guardar cambios'
+                      : 'Crear vehículo',
             ),
           ),
         ],

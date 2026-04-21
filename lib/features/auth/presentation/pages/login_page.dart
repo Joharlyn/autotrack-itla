@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../../app/routes/app_routes.dart';
 import '../../../../core/storage/session_provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/widgets/auth_header_card.dart';
 import '../../data/services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
@@ -102,113 +103,87 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Iniciar sesión')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: AppTheme.card,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppTheme.border),
+      appBar: AppBar(
+        title: const Text('Iniciar sesión'),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
+        children: [
+          const AuthHeaderCard(
+            icon: Icons.login_rounded,
+            title: 'Bienvenido de vuelta',
+            subtitle:
+                'Inicia sesión para acceder a tus vehículos, mantenimientos, finanzas y foro privado.',
+          ),
+          const SizedBox(height: 22),
+          AuthSectionCard(
+            title: 'Acceso a la cuenta',
+            subtitle:
+                'Ingresa con tu matrícula y contraseña para continuar dentro de la aplicación.',
+            children: [
+              TextField(
+                controller: _matriculaController,
+                decoration: const InputDecoration(
+                  labelText: 'Matrícula',
+                  hintText: '2023-0181',
+                  prefixIcon: Icon(Icons.badge_rounded),
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Acceso',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Ingresa con tu matrícula y contraseña.',
-                    style: TextStyle(color: AppTheme.textSecondary),
-                  ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: _matriculaController,
-                    decoration: const InputDecoration(
-                      labelText: 'Matrícula',
-                      hintText: '2023-0181',
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  TextField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Contraseña',
-                      hintText: '******',
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _isLoggingIn ? null : _login,
-                    child: Text(_isLoggingIn ? 'Entrando...' : 'Entrar'),
-                  ),
-                  const SizedBox(height: 10),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.registerActivation,
-                      );
-                    },
-                    child: const Text('¿No has activado tu cuenta todavía?'),
-                  ),
-                ],
+              const SizedBox(height: 12),
+              TextField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Contraseña',
+                  hintText: '******',
+                  prefixIcon: Icon(Icons.lock_rounded),
+                ),
               ),
-            ),
-            const SizedBox(height: 18),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: AppTheme.card,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppTheme.border),
+              const SizedBox(height: 18),
+              ElevatedButton.icon(
+                onPressed: _isLoggingIn ? null : _login,
+                icon: const Icon(Icons.login_rounded),
+                label: Text(
+                  _isLoggingIn ? 'Entrando...' : 'Iniciar sesión',
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Recuperar contraseña',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Solicita una clave temporal usando tu matrícula.',
-                    style: TextStyle(color: AppTheme.textSecondary),
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _forgotMatriculaController,
-                    decoration: const InputDecoration(
-                      labelText: 'Matrícula',
-                      hintText: '2023-0181',
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: _isRecovering ? null : _forgotPassword,
-                    child: Text(_isRecovering ? 'Procesando...' : 'Recuperar'),
-                  ),
-                ],
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    AppRoutes.registerActivation,
+                  );
+                },
+                child: const Text('¿No has activado tu cuenta todavía?'),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          AuthSectionCard(
+            title: 'Recuperar contraseña',
+            subtitle:
+                'Solicita una clave temporal usando tu matrícula institucional.',
+            children: [
+              TextField(
+                controller: _forgotMatriculaController,
+                decoration: const InputDecoration(
+                  labelText: 'Matrícula',
+                  hintText: '2023-0181',
+                  prefixIcon: Icon(Icons.key_rounded),
+                ),
+              ),
+              const SizedBox(height: 18),
+              ElevatedButton.icon(
+                onPressed: _isRecovering ? null : _forgotPassword,
+                icon: const Icon(Icons.refresh_rounded),
+                label: Text(
+                  _isRecovering ? 'Procesando...' : 'Recuperar contraseña',
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

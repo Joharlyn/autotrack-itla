@@ -15,7 +15,7 @@ class VehiculosItlaApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Vehículos ITLA',
-        theme: AppTheme.darkTheme,
+        theme: AppTheme.theme,
         initialRoute: AppRoutes.splash,
         onGenerateRoute: AppRoutes.onGenerateRoute,
       ),

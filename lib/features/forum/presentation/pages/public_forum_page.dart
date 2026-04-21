@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../app/routes/app_routes.dart';
@@ -18,7 +17,7 @@ class _PublicForumPageState extends State<PublicForumPage> {
 
   bool _isLoading = true;
   String? _error;
-  List<Map<String, dynamic>> _topics = [];
+  List<Map<String, dynamic>> _items = [];
 
   @override
   void initState() {
@@ -35,7 +34,7 @@ class _PublicForumPageState extends State<PublicForumPage> {
     try {
       final result = await _service.getTopics();
       setState(() {
-        _topics = result;
+        _items = result;
         _isLoading = false;
       });
     } catch (e) {
@@ -46,199 +45,355 @@ class _PublicForumPageState extends State<PublicForumPage> {
     }
   }
 
+  void _openDetail(Map<String, dynamic> item) {
+    final id = DataUtils.firstInt(item, ['id', 'tema_id']);
+    final title = DataUtils.firstString(
+      item,
+      ['titulo', 'title', 'nombre'],
+      fallback: 'Tema',
+    );
+
+    Navigator.pushNamed(
+      context,
+      AppRoutes.publicForumDetail,
+      arguments: {
+        'id': id,
+        'title': title,
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Foro comunitario')),
+      appBar: AppBar(
+        title: const Text('Foro público'),
+      ),
       body: RefreshIndicator(
         onRefresh: _loadTopics,
-        child: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(color: AppTheme.accent),
-              )
-            : _error != null
-            ? ListView(
-                children: [
-                  const SizedBox(height: 120),
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Text(
-                        _error!,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: AppTheme.textSecondary),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: AppTheme.border),
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFF141B26),
+                    Color(0xFF0B1017),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(22),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Foro comunitario',
+                      style: TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.8,
                       ),
                     ),
-                  ),
-                ],
-              )
-            : _topics.isEmpty
-            ? ListView(
-                children: const [
-                  SizedBox(height: 120),
-                  Center(
-                    child: Text(
-                      'No hay temas disponibles.',
-                      style: TextStyle(color: AppTheme.textSecondary),
+                    const SizedBox(height: 8),
+                    Text(
+                      _items.isEmpty
+                          ? 'Consulta temas y conversaciones abiertas por la comunidad automotriz.'
+                          : 'Hay ${_items.length} tema${_items.length == 1 ? '' : 's'} disponible${_items.length == 1 ? '' : 's'} para leer.',
+                      style: const TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 14,
+                        height: 1.45,
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 18),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _TopStat(
+                            title: 'Temas',
+                            value: '${_items.length}',
+                            icon: Icons.forum_rounded,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: _TopStat(
+                            title: 'Acceso',
+                            value: 'Solo lectura',
+                            icon: Icons.public_rounded,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 22),
+            const _SectionHeader(
+              title: 'Conversaciones abiertas',
+              subtitle: 'Explora los temas públicos y consulta sus respuestas.',
+            ),
+            const SizedBox(height: 16),
+            if (_isLoading)
+              const Padding(
+                padding: EdgeInsets.only(top: 40),
+                child: Center(
+                  child: CircularProgressIndicator(color: AppTheme.accent),
+                ),
               )
-            : ListView.separated(
-                padding: const EdgeInsets.all(16),
-                itemCount: _topics.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 14),
-                itemBuilder: (context, index) {
-                  final item = _topics[index];
-                  final id = DataUtils.firstInt(item, ['id', 'tema_id']);
-                  final title = DataUtils.firstString(item, [
-                    'titulo',
-                    'title',
-                    'nombre',
-                  ], fallback: 'Tema');
-                  final description = DataUtils.firstString(item, [
-                    'descripcion',
-                    'contenido',
-                    'mensaje',
-                  ], fallback: 'Sin descripción.');
-                  final author = DataUtils.firstString(item, [
-                    'autor',
-                    'usuario',
-                    'nombre_usuario',
-                    'creado_por',
-                  ], fallback: 'Autor no disponible');
-                  final vehicle = DataUtils.firstString(item, [
-                    'vehiculo',
-                    'vehiculo_asociado',
-                    'vehiculo_nombre',
-                  ]);
-                  final image = DataUtils.firstImage(item);
-                  final replies = DataUtils.firstInt(item, [
-                    'cantidad_respuestas',
-                    'respuestas_count',
-                    'total_respuestas',
-                  ]);
+            else if (_error != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 24),
+                child: Center(
+                  child: Text(
+                    _error!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(color: AppTheme.textSecondary),
+                  ),
+                ),
+              )
+            else if (_items.isEmpty)
+              Container(
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: AppTheme.card,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppTheme.border),
+                ),
+                child: const Column(
+                  children: [
+                    Icon(
+                      Icons.forum_outlined,
+                      size: 50,
+                      color: AppTheme.accent,
+                    ),
+                    SizedBox(height: 14),
+                    Text(
+                      'No hay temas públicos disponibles.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              ..._items.map((item) {
+                final title = DataUtils.firstString(
+                  item,
+                  ['titulo', 'title', 'nombre'],
+                  fallback: 'Tema',
+                );
+                final description = DataUtils.firstString(
+                  item,
+                  ['descripcion', 'contenido', 'mensaje'],
+                  fallback: 'Sin descripción.',
+                );
+                final author = DataUtils.firstString(
+                  item,
+                  ['autor', 'usuario', 'nombre_usuario', 'creado_por'],
+                  fallback: 'Usuario',
+                );
+                final fecha = DataUtils.firstString(
+                  item,
+                  ['fecha', 'created_at'],
+                  fallback: '',
+                );
 
-                  return InkWell(
-                    borderRadius: BorderRadius.circular(18),
-                    onTap: id == 0
-                        ? null
-                        : () {
-                            Navigator.pushNamed(
-                              context,
-                              AppRoutes.publicForumDetail,
-                              arguments: {'id': id, 'title': title},
-                            );
-                          },
-                    child: Ink(
-                      decoration: BoxDecoration(
-                        color: AppTheme.card,
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: AppTheme.border),
-                      ),
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: AppTheme.card,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: AppTheme.border),
+                  ),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(24),
+                    onTap: () => _openDetail(item),
+                    child: Padding(
+                      padding: const EdgeInsets.all(18),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (image.isNotEmpty)
-                            ClipRRect(
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(18),
-                              ),
-                              child: CachedNetworkImage(
-                                imageUrl: image,
-                                width: double.infinity,
-                                height: 180,
-                                fit: BoxFit.cover,
-                                placeholder: (_, __) => Container(
-                                  height: 180,
-                                  color: AppTheme.softCard,
-                                  child: const Center(
-                                    child: CircularProgressIndicator(
-                                      color: AppTheme.accent,
-                                    ),
-                                  ),
-                                ),
-                                errorWidget: (_, __, ___) => Container(
-                                  height: 180,
-                                  color: AppTheme.softCard,
-                                  child: const Icon(
-                                    Icons.forum_rounded,
-                                    color: AppTheme.textSecondary,
-                                    size: 42,
-                                  ),
-                                ),
-                              ),
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              color: AppTheme.textPrimary,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.4,
                             ),
-                          Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  title,
-                                  style: const TextStyle(
-                                    color: AppTheme.textPrimary,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  description,
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: AppTheme.textSecondary,
-                                    height: 1.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 14),
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  children: [
-                                    _ChipText(
-                                      text: author,
-                                      icon: Icons.person_rounded,
-                                    ),
-                                    if (vehicle.isNotEmpty)
-                                      _ChipText(
-                                        text: vehicle,
-                                        icon: Icons.directions_car_rounded,
-                                      ),
-                                    _ChipText(
-                                      text: '$replies respuestas',
-                                      icon: Icons.comment_rounded,
-                                    ),
-                                  ],
-                                ),
-                              ],
+                          ),
+                          const SizedBox(height: 14),
+                          Text(
+                            description,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: AppTheme.textSecondary,
+                              height: 1.55,
                             ),
+                          ),
+                          const SizedBox(height: 14),
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: [
+                              _DataPill(
+                                icon: Icons.person_rounded,
+                                text: author,
+                              ),
+                              if (fecha.isNotEmpty)
+                                _DataPill(
+                                  icon: Icons.calendar_month_rounded,
+                                  text: DataUtils.formatDate(fecha),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 14),
+                          Row(
+                            children: const [
+                              Text(
+                                'Ver tema',
+                                style: TextStyle(
+                                  color: AppTheme.accent,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              SizedBox(width: 6),
+                              Icon(
+                                Icons.arrow_forward_rounded,
+                                color: AppTheme.accent,
+                                size: 16,
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              }),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _ChipText extends StatelessWidget {
-  final String text;
+class _TopStat extends StatelessWidget {
+  final String title;
+  final String value;
   final IconData icon;
 
-  const _ChipText({required this.text, required this.icon});
+  const _TopStat({
+    required this.title,
+    required this.value,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.softCard,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: AppTheme.accent, size: 18),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: const TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              color: AppTheme.textPrimary,
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const _SectionHeader({
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: AppTheme.textPrimary,
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.6,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          subtitle,
+          style: const TextStyle(
+            color: AppTheme.textSecondary,
+            fontSize: 14,
+            height: 1.45,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DataPill extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _DataPill({
+    required this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
       decoration: BoxDecoration(
         color: AppTheme.softCard,
         borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppTheme.border),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -248,9 +403,9 @@ class _ChipText extends StatelessWidget {
           Text(
             text,
             style: const TextStyle(
-              color: AppTheme.textSecondary,
+              color: AppTheme.textPrimary,
               fontSize: 12,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],

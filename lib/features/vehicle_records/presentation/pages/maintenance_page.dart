@@ -176,12 +176,10 @@ class _MaintenancePageState extends State<MaintenancePage> {
   }
 
   List<String> _photosOf(Map<String, dynamic> item) {
-    final photos = DataUtils.extractStringList(item, [
-      'fotos',
-      'imagenes',
-      'galeria',
-      'gallery',
-    ]);
+    final photos = DataUtils.extractStringList(
+      item,
+      ['fotos', 'imagenes', 'galeria', 'gallery'],
+    );
 
     final single = DataUtils.firstImage(item);
     if (photos.isEmpty && single.isNotEmpty) return [single];
@@ -192,9 +190,9 @@ class _MaintenancePageState extends State<MaintenancePage> {
   }
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -218,34 +216,100 @@ class _MaintenancePageState extends State<MaintenancePage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mantenimientos')),
+      appBar: AppBar(
+        title: const Text('Mantenimientos'),
+      ),
       body: RefreshIndicator(
         onRefresh: _loadMaintenances,
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
           children: [
             Container(
-              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: AppTheme.border),
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFF141B26),
+                    Color(0xFF0B1017),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(22),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.vehicleName,
+                      style: const TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.8,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Registra servicios, cambios y reparaciones realizados al vehículo.',
+                      style: TextStyle(
+                        color: AppTheme.textSecondary,
+                        fontSize: 14,
+                        height: 1.45,
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _TopStat(
+                            title: 'Historial',
+                            value: '${_items.length} registros',
+                            icon: Icons.build_rounded,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _TopStat(
+                            title: 'Fotos',
+                            value: '${_selectedPhotos.length}/5',
+                            icon: Icons.photo_library_rounded,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 22),
+            Container(
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: AppTheme.card,
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(24),
                 border: Border.all(color: AppTheme.border),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    widget.vehicleName,
-                    style: const TextStyle(
+                  const Text(
+                    'Registrar mantenimiento',
+                    style: TextStyle(
                       color: AppTheme.textPrimary,
-                      fontSize: 18,
+                      fontSize: 22,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Registrar mantenimiento',
-                    style: TextStyle(color: AppTheme.textSecondary),
+                    'Completa los datos del servicio y agrega evidencias fotográficas si las tienes.',
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: 14,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   TextField(
@@ -253,21 +317,25 @@ class _MaintenancePageState extends State<MaintenancePage> {
                     decoration: const InputDecoration(
                       labelText: 'Tipo',
                       hintText: 'Ej: Cambio de aceite',
+                      prefixIcon: Icon(Icons.handyman_rounded),
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _costoController,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(
+                      labelText: 'Costo',
+                      prefixIcon: Icon(Icons.payments_rounded),
                     ),
-                    decoration: const InputDecoration(labelText: 'Costo'),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _piezasController,
                     decoration: const InputDecoration(
                       labelText: 'Piezas (opcional)',
+                      prefixIcon: Icon(Icons.inventory_2_rounded),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -277,48 +345,59 @@ class _MaintenancePageState extends State<MaintenancePage> {
                     onTap: _pickDate,
                     decoration: const InputDecoration(
                       labelText: 'Fecha',
-                      suffixIcon: Icon(Icons.calendar_month_rounded),
+                      prefixIcon: Icon(Icons.calendar_month_rounded),
                     ),
                   ),
                   const SizedBox(height: 14),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: _pickPhotos,
-                        icon: const Icon(Icons.add_a_photo_rounded),
-                        label: Text('Fotos (${_selectedPhotos.length}/5)'),
-                      ),
-                    ],
+                  ElevatedButton.icon(
+                    onPressed: _pickPhotos,
+                    icon: const Icon(Icons.add_a_photo_rounded),
+                    label: Text('Agregar fotos (${_selectedPhotos.length}/5)'),
                   ),
-                  if (_selectedPhotos.isNotEmpty) const SizedBox(height: 12),
+                  if (_selectedPhotos.isNotEmpty) const SizedBox(height: 14),
                   if (_selectedPhotos.isNotEmpty)
-                    Column(
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 10,
                       children: List.generate(_selectedPhotos.length, (index) {
                         return Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: AppTheme.softCard,
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: AppTheme.border),
                           ),
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Expanded(
+                              const Icon(
+                                Icons.image_rounded,
+                                color: AppTheme.accent,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 8),
+                              ConstrainedBox(
+                                constraints: const BoxConstraints(maxWidth: 140),
                                 child: Text(
                                   _selectedPhotos[index].name,
+                                  overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     color: AppTheme.textSecondary,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ),
-                              IconButton(
-                                onPressed: () => _removePhotoAt(index),
-                                icon: const Icon(
+                              const SizedBox(width: 6),
+                              InkWell(
+                                onTap: () => _removePhotoAt(index),
+                                child: const Icon(
                                   Icons.close_rounded,
-                                  color: Colors.redAccent,
+                                  color: AppTheme.danger,
+                                  size: 18,
                                 ),
                               ),
                             ],
@@ -326,17 +405,25 @@ class _MaintenancePageState extends State<MaintenancePage> {
                         );
                       }),
                     ),
-                  const SizedBox(height: 14),
-                  ElevatedButton(
+                  const SizedBox(height: 18),
+                  ElevatedButton.icon(
                     onPressed: _isSaving ? null : _saveMaintenance,
-                    child: Text(
-                      _isSaving ? 'Guardando...' : 'Registrar mantenimiento',
+                    icon: const Icon(Icons.save_rounded),
+                    label: Text(
+                      _isSaving
+                          ? 'Guardando...'
+                          : 'Registrar mantenimiento',
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 22),
+            const _SectionHeader(
+              title: 'Historial de mantenimiento',
+              subtitle: 'Consulta todos los servicios registrados para este vehículo.',
+            ),
+            const SizedBox(height: 16),
             if (_isLoading)
               const Padding(
                 padding: EdgeInsets.only(top: 40),
@@ -345,9 +432,9 @@ class _MaintenancePageState extends State<MaintenancePage> {
                 ),
               )
             else if (_error != null)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 40),
+              Padding(
+                padding: const EdgeInsets.only(top: 24),
+                child: Center(
                   child: Text(
                     _error!,
                     textAlign: TextAlign.center,
@@ -356,74 +443,124 @@ class _MaintenancePageState extends State<MaintenancePage> {
                 ),
               )
             else if (_items.isEmpty)
-              const Text(
-                'No hay mantenimientos registrados.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: AppTheme.textSecondary),
+              Container(
+                padding: const EdgeInsets.all(22),
+                decoration: BoxDecoration(
+                  color: AppTheme.card,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppTheme.border),
+                ),
+                child: const Column(
+                  children: [
+                    Icon(
+                      Icons.build_circle_outlined,
+                      size: 50,
+                      color: AppTheme.accent,
+                    ),
+                    SizedBox(height: 14),
+                    Text(
+                      'No hay mantenimientos registrados.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppTheme.textPrimary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Registra el primer servicio para comenzar a construir el historial del vehículo.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppTheme.textSecondary,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                ),
               )
             else
               ..._items.map((item) {
-                final tipo = DataUtils.firstString(item, [
-                  'tipo',
-                  'nombre',
-                ], fallback: 'Mantenimiento');
+                final tipo = DataUtils.firstString(
+                  item,
+                  ['tipo', 'nombre'],
+                  fallback: 'Mantenimiento',
+                );
                 final costo = DataUtils.firstString(item, ['costo', 'monto']);
-                final fecha = DataUtils.firstString(item, [
-                  'fecha',
-                  'created_at',
-                ]);
+                final fecha = DataUtils.firstString(item, ['fecha', 'created_at']);
                 final piezas = DataUtils.firstString(item, ['piezas']);
                 final photos = _photosOf(item);
 
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 14),
-                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
                     color: AppTheme.card,
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(24),
                     border: Border.all(color: AppTheme.border),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        tipo,
-                        style: const TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                        ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 46,
+                            height: 46,
+                            decoration: BoxDecoration(
+                              color: AppTheme.accent.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Icon(
+                              Icons.build_rounded,
+                              color: AppTheme.accent,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              tipo,
+                              style: const TextStyle(
+                                color: AppTheme.textPrimary,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.4,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 10),
-                      if (costo.isNotEmpty)
-                        Text(
-                          'Costo: ${DataUtils.formatMoney(costo)}',
-                          style: const TextStyle(color: AppTheme.accent),
-                        ),
-                      if (fecha.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(
-                            'Fecha: ${DataUtils.formatDate(fecha)}',
-                            style: const TextStyle(
-                              color: AppTheme.textSecondary,
+                      const SizedBox(height: 14),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          if (costo.isNotEmpty)
+                            _DataPill(
+                              icon: Icons.payments_rounded,
+                              text: DataUtils.formatMoney(costo),
                             ),
-                          ),
-                        ),
+                          if (fecha.isNotEmpty)
+                            _DataPill(
+                              icon: Icons.calendar_month_rounded,
+                              text: DataUtils.formatDate(fecha),
+                            ),
+                        ],
+                      ),
+                      if (piezas.isNotEmpty) const SizedBox(height: 14),
                       if (piezas.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(
-                            'Piezas: $piezas',
-                            style: const TextStyle(
-                              color: AppTheme.textSecondary,
-                            ),
+                        Text(
+                          'Piezas: $piezas',
+                          style: const TextStyle(
+                            color: AppTheme.textSecondary,
+                            height: 1.5,
                           ),
                         ),
-                      if (photos.isNotEmpty) const SizedBox(height: 12),
+                      if (photos.isNotEmpty) const SizedBox(height: 16),
                       if (photos.isNotEmpty)
                         SizedBox(
-                          height: 84,
+                          height: 90,
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
                             itemCount: photos.length,
@@ -431,16 +568,16 @@ class _MaintenancePageState extends State<MaintenancePage> {
                                 const SizedBox(width: 10),
                             itemBuilder: (context, index) {
                               return ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(16),
                                 child: Image.network(
                                   photos[index],
-                                  width: 84,
-                                  height: 84,
+                                  width: 90,
+                                  height: 90,
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) {
                                     return Container(
-                                      width: 84,
-                                      height: 84,
+                                      width: 90,
+                                      height: 90,
                                       color: AppTheme.softCard,
                                       child: const Icon(
                                         Icons.image_not_supported_rounded,
@@ -459,6 +596,128 @@ class _MaintenancePageState extends State<MaintenancePage> {
               }),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _TopStat extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+
+  const _TopStat({
+    required this.title,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppTheme.softCard,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: AppTheme.accent, size: 18),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: const TextStyle(
+              color: AppTheme.textSecondary,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              color: AppTheme.textPrimary,
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const _SectionHeader({
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: AppTheme.textPrimary,
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.6,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          subtitle,
+          style: const TextStyle(
+            color: AppTheme.textSecondary,
+            fontSize: 14,
+            height: 1.45,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DataPill extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _DataPill({
+    required this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+      decoration: BoxDecoration(
+        color: AppTheme.softCard,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 15, color: AppTheme.accent),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: const TextStyle(
+              color: AppTheme.textPrimary,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
       ),
     );
   }

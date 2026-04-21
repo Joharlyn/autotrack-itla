@@ -1,11 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../app/routes/app_routes.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/storage/session_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 
 class SplashPage extends StatefulWidget {
@@ -19,15 +14,11 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    _bootstrap();
+    _goNext();
   }
 
-  Future<void> _bootstrap() async {
-    final session = context.read<SessionProvider>();
-    await session.init();
-
-    await Future.delayed(const Duration(milliseconds: 1400));
-
+  Future<void> _goNext() async {
+    await Future.delayed(const Duration(milliseconds: 1800));
     if (!mounted) return;
     Navigator.pushReplacementNamed(context, AppRoutes.dashboard);
   }
@@ -39,37 +30,92 @@ class _SplashPageState extends State<SplashPage> {
         width: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF090909), Color(0xFF121212), Color(0xFF1A1208)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF07090D),
+              Color(0xFF0E131B),
+              Color(0xFF151C27),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
         ),
-        child: const Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.directions_car_rounded,
-                size: 72,
-                color: AppTheme.accent,
-              ),
-              SizedBox(height: 18),
-              Text(
-                AppConstants.appName,
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  color: AppTheme.textPrimary,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              children: [
+                const Spacer(),
+                Container(
+                  width: 118,
+                  height: 118,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    gradient: const LinearGradient(
+                      colors: [
+                        AppTheme.accent,
+                        AppTheme.accentSoft,
+                      ],
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x55FF7A00),
+                        blurRadius: 26,
+                        offset: Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.directions_car_filled_rounded,
+                    color: Colors.white,
+                    size: 54,
+                  ),
                 ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Gestión vehicular para ITLA',
-                style: TextStyle(fontSize: 14, color: AppTheme.textSecondary),
-              ),
-              SizedBox(height: 24),
-              CircularProgressIndicator(color: AppTheme.accent),
-            ],
+                const SizedBox(height: 26),
+                const Text(
+                  'AutoTrack ITLA',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: 34,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -1,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Gestión integral de vehículos,\nfinanzas, mantenimiento y comunidad.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 15,
+                    height: 1.55,
+                  ),
+                ),
+                const Spacer(),
+                Column(
+                  children: [
+                    const SizedBox(
+                      width: 28,
+                      height: 28,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.4,
+                        color: AppTheme.accent,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Cargando experiencia',
+                      style: TextStyle(
+                        color: AppTheme.textSecondary.withOpacity(0.9),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 22),
+              ],
+            ),
           ),
         ),
       ),

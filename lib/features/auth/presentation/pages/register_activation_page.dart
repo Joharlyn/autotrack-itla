@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../app/routes/app_routes.dart';
 import '../../../../core/storage/session_provider.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../../shared/widgets/auth_header_card.dart';
 import '../../data/services/auth_service.dart';
 
 class RegisterActivationPage extends StatefulWidget {
@@ -111,104 +111,83 @@ class _RegisterActivationPageState extends State<RegisterActivationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Registro y activación')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: AppTheme.card,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppTheme.border),
+      appBar: AppBar(
+        title: const Text('Registro y activación'),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 10, 16, 28),
+        children: [
+          const AuthHeaderCard(
+            icon: Icons.verified_user_rounded,
+            title: 'Activa tu cuenta',
+            subtitle:
+                'Completa el registro con tu matrícula y luego activa tu acceso con el token temporal.',
+          ),
+          const SizedBox(height: 22),
+          AuthSectionCard(
+            title: '1) Registro',
+            subtitle:
+                'Envía tu matrícula para recibir el token temporal necesario para activar la cuenta.',
+            children: [
+              TextField(
+                controller: _registerMatriculaController,
+                decoration: const InputDecoration(
+                  labelText: 'Matrícula',
+                  hintText: '2023-0181',
+                  prefixIcon: Icon(Icons.badge_rounded),
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '1) Registro',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Envía tu matrícula para recibir el token temporal.',
-                    style: TextStyle(color: AppTheme.textSecondary),
-                  ),
-                  const SizedBox(height: 18),
-                  TextField(
-                    controller: _registerMatriculaController,
-                    decoration: const InputDecoration(
-                      labelText: 'Matrícula',
-                      hintText: '2023-0181',
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  ElevatedButton(
-                    onPressed: _isRegistering ? null : _register,
-                    child: Text(_isRegistering ? 'Procesando...' : 'Registrar'),
-                  ),
-                ],
+              const SizedBox(height: 18),
+              ElevatedButton.icon(
+                onPressed: _isRegistering ? null : _register,
+                icon: const Icon(Icons.person_add_alt_1_rounded),
+                label: Text(
+                  _isRegistering ? 'Procesando...' : 'Registrar',
+                ),
               ),
-            ),
-            const SizedBox(height: 18),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: AppTheme.card,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppTheme.border),
+            ],
+          ),
+          const SizedBox(height: 18),
+          AuthSectionCard(
+            title: '2) Activación',
+            subtitle:
+                'Usa el token temporal y define tu contraseña definitiva para completar el acceso.',
+            children: [
+              TextField(
+                controller: _activateTokenController,
+                decoration: const InputDecoration(
+                  labelText: 'Token temporal',
+                  prefixIcon: Icon(Icons.key_rounded),
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '2) Activación',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Usa el token temporal y define tu contraseña definitiva.',
-                    style: TextStyle(color: AppTheme.textSecondary),
-                  ),
-                  const SizedBox(height: 18),
-                  TextField(
-                    controller: _activateTokenController,
-                    decoration: const InputDecoration(
-                      labelText: 'Token temporal',
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  TextField(
-                    controller: _activatePasswordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Contraseña',
-                      hintText: 'Mínimo 6 caracteres',
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  ElevatedButton(
-                    onPressed: _isActivating ? null : _activate,
-                    child: Text(
-                      _isActivating ? 'Activando...' : 'Activar cuenta',
-                    ),
-                  ),
-                ],
+              const SizedBox(height: 12),
+              TextField(
+                controller: _activatePasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Contraseña',
+                  hintText: 'Mínimo 6 caracteres',
+                  prefixIcon: Icon(Icons.lock_rounded),
+                ),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(height: 18),
+              ElevatedButton.icon(
+                onPressed: _isActivating ? null : _activate,
+                icon: const Icon(Icons.verified_rounded),
+                label: Text(
+                  _isActivating ? 'Activando...' : 'Activar cuenta',
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, AppRoutes.login);
+                },
+                child: const Text('Ya tengo acceso, ir a iniciar sesión'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

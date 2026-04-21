@@ -13,7 +13,10 @@ import '../../data/services/vehicles_service.dart';
 class VehicleDetailPage extends StatefulWidget {
   final int id;
 
-  const VehicleDetailPage({super.key, required this.id});
+  const VehicleDetailPage({
+    super.key,
+    required this.id,
+  });
 
   @override
   State<VehicleDetailPage> createState() => _VehicleDetailPageState();
@@ -102,7 +105,9 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
     final updated = await Navigator.pushNamed(
       context,
       AppRoutes.vehicleForm,
-      arguments: {'vehicle': _vehicle},
+      arguments: {
+        'vehicle': _vehicle,
+      },
     );
 
     if (updated == true) {
@@ -125,18 +130,14 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
     }
 
     final map = <String, dynamic>{
-      'total_mantenimientos':
-          item['total_mantenimientos'] ?? item['totalMantenimientos'],
-      'total_combustible':
-          item['total_combustible'] ?? item['totalCombustible'],
+      'total_mantenimientos': item['total_mantenimientos'] ?? item['totalMantenimientos'],
+      'total_combustible': item['total_combustible'] ?? item['totalCombustible'],
       'total_gastos': item['total_gastos'] ?? item['totalGastos'],
       'total_ingresos': item['total_ingresos'] ?? item['totalIngresos'],
       'balance': item['balance'],
     };
 
-    map.removeWhere(
-      (key, value) => value == null || value.toString().trim().isEmpty,
-    );
+    map.removeWhere((key, value) => value == null || value.toString().trim().isEmpty);
     return map;
   }
 
@@ -152,14 +153,17 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
     Navigator.pushNamed(
       context,
       route,
-      arguments: {'vehicleId': widget.id, 'vehicleName': _vehicleName},
+      arguments: {
+        'vehicleId': widget.id,
+        'vehicleName': _vehicleName,
+      },
     );
   }
 
   void _showSnack(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -213,25 +217,38 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
     final chasis = DataUtils.firstString(item, ['chasis'], fallback: '-');
     final marca = DataUtils.firstString(item, ['marca']);
     final modelo = DataUtils.firstString(item, ['modelo', 'nombre']);
-    final anio = DataUtils.firstString(item, ['anio', 'year'], fallback: '-');
-    final ruedas = DataUtils.firstString(item, [
-      'cantidadRuedas',
-      'cantidad_ruedas',
-      'ruedas',
-    ], fallback: '-');
+    final anio = DataUtils.firstString(
+      item,
+      ['anio', 'year'],
+      fallback: '-',
+    );
+    final ruedas = DataUtils.firstString(
+      item,
+      ['cantidadRuedas', 'cantidad_ruedas', 'ruedas'],
+      fallback: '-',
+    );
 
     final financial = _financialMap(item);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Detalle vehículo')),
+      appBar: AppBar(
+        title: const Text('Detalle vehículo'),
+      ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
         children: [
           Container(
             decoration: BoxDecoration(
               color: AppTheme.card,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(28),
               border: Border.all(color: AppTheme.border),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x18000000),
+                  blurRadius: 18,
+                  offset: Offset(0, 8),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,15 +256,15 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                 if (image.isNotEmpty)
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(18),
+                      top: Radius.circular(28),
                     ),
                     child: CachedNetworkImage(
                       imageUrl: image,
                       width: double.infinity,
-                      height: 230,
+                      height: 240,
                       fit: BoxFit.cover,
                       placeholder: (_, __) => Container(
-                        height: 230,
+                        height: 240,
                         color: AppTheme.softCard,
                         child: const Center(
                           child: CircularProgressIndicator(
@@ -256,7 +273,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                         ),
                       ),
                       errorWidget: (_, __, ___) => Container(
-                        height: 230,
+                        height: 240,
                         color: AppTheme.softCard,
                         child: const Icon(
                           Icons.directions_car_rounded,
@@ -265,38 +282,97 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                         ),
                       ),
                     ),
+                  )
+                else
+                  Container(
+                    height: 220,
+                    decoration: const BoxDecoration(
+                      color: AppTheme.softCard,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(28),
+                      ),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.directions_car_rounded,
+                        color: AppTheme.textSecondary,
+                        size: 50,
+                      ),
+                    ),
                   ),
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        _vehicleName,
-                        style: const TextStyle(
-                          color: AppTheme.textPrimary,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _vehicleName,
+                              style: const TextStyle(
+                                color: AppTheme.textPrimary,
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: -0.8,
+                              ),
+                            ),
+                          ),
+                          if (anio.isNotEmpty)
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 7,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppTheme.accent.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text(
+                                anio,
+                                style: const TextStyle(
+                                  color: AppTheme.accent,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.pin_outlined,
+                            color: AppTheme.textSecondary,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Placa: $placa',
+                            style: const TextStyle(
+                              color: AppTheme.textSecondary,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
                       Wrap(
                         spacing: 10,
                         runSpacing: 10,
                         children: [
-                          ElevatedButton.icon(
-                            onPressed: _goToEdit,
-                            icon: const Icon(Icons.edit_rounded),
-                            label: const Text('Editar datos'),
+                          _ActionButton(
+                            icon: Icons.edit_rounded,
+                            label: 'Editar datos',
+                            onTap: _goToEdit,
                           ),
-                          ElevatedButton.icon(
-                            onPressed: _isUpdatingPhoto ? null : _changePhoto,
-                            icon: const Icon(Icons.photo_camera_rounded),
-                            label: Text(
-                              _isUpdatingPhoto
-                                  ? 'Cambiando foto...'
-                                  : 'Cambiar foto',
-                            ),
+                          _ActionButton(
+                            icon: Icons.photo_camera_rounded,
+                            label: _isUpdatingPhoto
+                                ? 'Cambiando foto...'
+                                : 'Cambiar foto',
+                            onTap: _isUpdatingPhoto ? null : _changePhoto,
                           ),
                         ],
                       ),
@@ -306,44 +382,49 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
-          _InfoCard(
+          const SizedBox(height: 22),
+          const _SectionHeader(
             title: 'Módulos del vehículo',
+            subtitle: 'Accede a cada área de gestión relacionada con este vehículo.',
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
             children: [
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () => _openModule(AppRoutes.maintenance),
-                    icon: const Icon(Icons.build_rounded),
-                    label: const Text('Mantenimientos'),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () => _openModule(AppRoutes.fuelOil),
-                    icon: const Icon(Icons.local_gas_station_rounded),
-                    label: const Text('Combustible/Aceite'),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () => _openModule(AppRoutes.tires),
-                    icon: const Icon(Icons.tire_repair_rounded),
-                    label: const Text('Estado de gomas'),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () => _openModule(AppRoutes.expenseIncome),
-                    icon: const Icon(Icons.payments_rounded),
-                    label: const Text('Gastos/Ingresos'),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () => _openModule(AppRoutes.forumPrivate),
-                    icon: const Icon(Icons.forum_rounded),
-                    label: const Text('Foro'),
-                  ),
-                ],
+              _ModuleCard(
+                icon: Icons.build_rounded,
+                title: 'Mantenimientos',
+                subtitle: 'Registra y consulta servicios realizados.',
+                onTap: () => _openModule(AppRoutes.maintenance),
+              ),
+              _ModuleCard(
+                icon: Icons.local_gas_station_rounded,
+                title: 'Combustible / Aceite',
+                subtitle: 'Controla consumo y registros relacionados.',
+                onTap: () => _openModule(AppRoutes.fuelOil),
+              ),
+              _ModuleCard(
+                icon: Icons.tire_repair_rounded,
+                title: 'Estado de gomas',
+                subtitle: 'Actualiza estado y registra pinchazos.',
+                onTap: () => _openModule(AppRoutes.tires),
+              ),
+              _ModuleCard(
+                icon: Icons.payments_rounded,
+                title: 'Gastos / Ingresos',
+                subtitle: 'Gestiona finanzas del vehículo.',
+                onTap: () => _openModule(AppRoutes.expenseIncome),
+              ),
+              _ModuleCard(
+                icon: Icons.forum_rounded,
+                title: 'Foro',
+                subtitle: 'Participa en discusiones asociadas.',
+                onTap: () => _openModule(AppRoutes.forumPrivate),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 22),
           _InfoCard(
             title: 'Datos principales',
             children: [
@@ -355,7 +436,7 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
               _InfoRow(label: 'Cantidad de ruedas', value: ruedas),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           _InfoCard(
             title: 'Resumen financiero',
             children: financial.isEmpty
@@ -366,36 +447,41 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
                     ),
                   ]
                 : [
-                    _InfoRow(
+                    _FinanceTile(
                       label: 'Mantenimientos',
                       value: DataUtils.formatMoney(
                         financial['total_mantenimientos'] ??
                             financial['totalMantenimientos'],
                       ),
+                      icon: Icons.build_rounded,
                     ),
-                    _InfoRow(
+                    _FinanceTile(
                       label: 'Combustible',
                       value: DataUtils.formatMoney(
                         financial['total_combustible'] ??
                             financial['totalCombustible'],
                       ),
+                      icon: Icons.local_gas_station_rounded,
                     ),
-                    _InfoRow(
+                    _FinanceTile(
                       label: 'Gastos',
                       value: DataUtils.formatMoney(
                         financial['total_gastos'] ?? financial['totalGastos'],
                       ),
+                      icon: Icons.receipt_long_rounded,
                     ),
-                    _InfoRow(
+                    _FinanceTile(
                       label: 'Ingresos',
                       value: DataUtils.formatMoney(
-                        financial['total_ingresos'] ??
-                            financial['totalIngresos'],
+                        financial['total_ingresos'] ?? financial['totalIngresos'],
                       ),
+                      icon: Icons.payments_rounded,
                     ),
-                    _InfoRow(
+                    _FinanceTile(
                       label: 'Balance',
                       value: DataUtils.formatMoney(financial['balance']),
+                      icon: Icons.account_balance_wallet_rounded,
+                      highlight: true,
                     ),
                   ],
           ),
@@ -405,11 +491,144 @@ class _VehicleDetailPageState extends State<VehicleDetailPage> {
   }
 }
 
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const _SectionHeader({
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: AppTheme.textPrimary,
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.6,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          subtitle,
+          style: const TextStyle(
+            color: AppTheme.textSecondary,
+            fontSize: 14,
+            height: 1.45,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback? onTap;
+
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon),
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        minimumSize: const Size(0, 52),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      ),
+    );
+  }
+}
+
+class _ModuleCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _ModuleCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: (MediaQuery.of(context).size.width - 44) / 2,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(22),
+          child: Ink(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppTheme.card,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: AppTheme.border),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: AppTheme.accent.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(icon, color: AppTheme.accent),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: AppTheme.textSecondary,
+                    fontSize: 13,
+                    height: 1.45,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _InfoCard extends StatelessWidget {
   final String title;
   final List<Widget> children;
 
-  const _InfoCard({required this.title, required this.children});
+  const _InfoCard({
+    required this.title,
+    required this.children,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -417,7 +636,7 @@ class _InfoCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppTheme.card,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(color: AppTheme.border),
       ),
       child: Column(
@@ -427,11 +646,11 @@ class _InfoCard extends StatelessWidget {
             title,
             style: const TextStyle(
               color: AppTheme.textPrimary,
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           ...children,
         ],
       ),
@@ -443,7 +662,10 @@ class _InfoRow extends StatelessWidget {
   final String label;
   final String value;
 
-  const _InfoRow({required this.label, required this.value});
+  const _InfoRow({
+    required this.label,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -458,7 +680,7 @@ class _InfoRow extends StatelessWidget {
               label,
               style: const TextStyle(
                 color: AppTheme.textSecondary,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),
@@ -467,8 +689,72 @@ class _InfoRow extends StatelessWidget {
               value,
               style: const TextStyle(
                 color: AppTheme.textPrimary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FinanceTile extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final bool highlight;
+
+  const _FinanceTile({
+    required this.label,
+    required this.value,
+    required this.icon,
+    this.highlight = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: highlight ? AppTheme.accent.withOpacity(0.08) : AppTheme.softCard,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: highlight ? AppTheme.accent.withOpacity(0.28) : AppTheme.border,
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: AppTheme.background,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              icon,
+              color: highlight ? AppTheme.accentSoft : AppTheme.accent,
+              size: 19,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: AppTheme.textSecondary,
                 fontWeight: FontWeight.w700,
               ),
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              color: highlight ? AppTheme.accentSoft : AppTheme.textPrimary,
+              fontWeight: FontWeight.w900,
+              fontSize: 15,
             ),
           ),
         ],
